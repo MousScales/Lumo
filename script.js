@@ -55,15 +55,10 @@ function updatePrice() {
         subtotal = 65.00; // $10 discount total
     }
     
-    // Add shipping and tax
-    const shipping = 5.00;
-    const tax = (subtotal + shipping) * 0.10; // 10% tax
-    const totalPrice = subtotal + shipping + tax;
-    
-    // Update add to cart button
+    // Update add to cart button (show only item price, no shipping/tax)
     const addToCartBtn = document.querySelector('.add-to-cart-btn');
     if (addToCartBtn) {
-        addToCartBtn.innerHTML = `<i class="fas fa-shopping-cart"></i> Add to Cart - $${totalPrice.toFixed(2)}`;
+        addToCartBtn.innerHTML = `<i class="fas fa-shopping-cart"></i> Add to Cart - $${subtotal.toFixed(2)}`;
     }
 }
 
@@ -96,10 +91,8 @@ function addToCart() {
         subtotal = 65.00; // $10 discount total
     }
     
-    // Add shipping and tax
-    const shipping = 5.00;
-    const tax = (subtotal + shipping) * 0.10; // 10% tax
-    const totalPrice = subtotal + shipping + tax;
+    // Store only item price in cart (shipping/tax added at checkout)
+    const itemPrice = subtotal;
     
     // Format model name for display
     const modelName = model.replace('airpods-', 'AirPods ').replace(/\b\w/g, l => l.toUpperCase());
@@ -116,12 +109,12 @@ function addToCart() {
         productId: productId, // Add product ID for Stripe
         quantity: quantity,
         basePrice: basePrice,
-        price: totalPrice,
+        price: itemPrice, // Store only item price
         name: `LumoCase AirPod Case (${color})`
     };
     
     cart.items.push(cartItem);
-    cart.total += totalPrice;
+    cart.total += itemPrice; // Add only item price to cart total
     
     updateCartDisplay();
     
@@ -338,6 +331,13 @@ function updateCartModal() {
             </div>
         `;
     });
+    
+    // Add shipping and tax note
+    cartHTML += `
+        <div class="cart-note">
+            <p><i class="fas fa-info-circle"></i> Shipping ($5.00) and tax (10%) will be added at checkout</p>
+        </div>
+    `;
     
     cartModalBody.innerHTML = cartHTML;
     cartTotalAmount.textContent = cart.total.toFixed(2);

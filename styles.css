@@ -921,6 +921,29 @@ body {
     margin: 0;
 }
 
+.cart-note {
+    margin-top: 1rem;
+    padding: 1rem;
+    background: rgba(251, 191, 36, 0.1);
+    border: 1px solid rgba(251, 191, 36, 0.3);
+    border-radius: 10px;
+    text-align: center;
+}
+
+.cart-note p {
+    color: #fbbf24;
+    font-size: 0.9rem;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.cart-note i {
+    font-size: 1rem;
+}
+
 /* Payment Element Styling */
 .payment-element-container {
     margin: 1.5rem 0;
