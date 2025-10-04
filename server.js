@@ -155,7 +155,7 @@ app.post('/api/create-payment-intent', async (req, res) => {
     const lineItems = [];
     
     for (const item of items) {
-      const productId = `${item.color}-${item.model}`;
+      const productId = `${item.color}-${item.modelId}`;
       const productData = PRODUCTS[productId];
       
       if (!productData) {

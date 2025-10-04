@@ -101,11 +101,16 @@ function addToCart() {
     // Format model name for display
     const modelName = model.replace('airpods-', 'AirPods ').replace(/\b\w/g, l => l.toUpperCase());
     
+    // Create product ID that matches Stripe products
+    const productId = `${color}-${model}`;
+    
     // Add item to cart
     const cartItem = {
         id: Date.now(),
         color: color,
         model: modelName,
+        modelId: model, // Keep original model ID for Stripe
+        productId: productId, // Add product ID for Stripe
         quantity: quantity,
         basePrice: basePrice,
         price: totalPrice,
