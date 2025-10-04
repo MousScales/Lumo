@@ -13,8 +13,11 @@ STRIPE_PUBLISHABLE_KEY=your_stripe_publishable_key_here
 
 ### Vercel
 1. Connect your GitHub repository
-2. Set environment variables in Vercel dashboard
-3. Deploy automatically
+2. Set environment variables in Vercel dashboard:
+   - `STRIPE_SECRET_KEY` = your live secret key
+   - `STRIPE_PUBLISHABLE_KEY` = your live publishable key
+3. Deploy automatically (vercel.json is already configured)
+4. Update `script.js` line 2 with your live publishable key after deployment
 
 ### Netlify
 1. Connect your GitHub repository
