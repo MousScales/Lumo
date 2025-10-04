@@ -55,17 +55,10 @@ function updatePrice() {
         totalPrice = 80.00; // $10 discount
     }
     
-    document.getElementById('subtotal').textContent = `$${totalPrice.toFixed(2)}`;
-    document.getElementById('total').textContent = `$${totalPrice.toFixed(2)}`;
-    
     // Update add to cart button
     const addToCartBtn = document.querySelector('.add-to-cart-btn');
-    addToCartBtn.innerHTML = `<i class="fas fa-shopping-cart"></i> Add to Cart - $${totalPrice.toFixed(2)}`;
-    
-    // Update checkout button
-    const checkoutButton = document.querySelector('.checkout-button');
-    if (checkoutButton) {
-        checkoutButton.innerHTML = `<i class="fas fa-lock"></i> Secure Checkout - $${totalPrice.toFixed(2)}`;
+    if (addToCartBtn) {
+        addToCartBtn.innerHTML = `<i class="fas fa-shopping-cart"></i> Add to Cart - $${totalPrice.toFixed(2)}`;
     }
 }
 
@@ -282,6 +275,19 @@ function showCartModal() {
 function hideCartModal() {
     const cartModal = document.getElementById('cartModal');
     cartModal.style.display = 'none';
+    
+    // Clean up payment element if it exists
+    const paymentElementContainer = document.getElementById('payment-element');
+    if (paymentElementContainer) {
+        paymentElementContainer.remove();
+    }
+    
+    // Reset checkout button
+    const checkoutBtn = document.getElementById('checkoutBtn');
+    if (checkoutBtn) {
+        checkoutBtn.innerHTML = '<i class="fas fa-lock"></i> Proceed to Checkout';
+        checkoutBtn.onclick = null;
+    }
 }
 
 function updateCartModal() {
@@ -455,6 +461,15 @@ async function handleSubmit() {
         // Handle Stripe payment
         if (!stripe || !elements) {
             console.error('Stripe not initialized');
+            alert('Payment system not available. Please try again later.');
+            return;
+        }
+        
+        // Check if payment element is mounted
+        const paymentElementContainer = document.getElementById('payment-element');
+        if (!paymentElementContainer || !paymentElement) {
+            console.error('Payment element not properly mounted');
+            alert('Payment form not ready. Please try again.');
             return;
         }
         
@@ -555,6 +570,12 @@ async function processStripePayment() {
         
         paymentElement = elements.create('payment');
         
+        // Clean up any existing payment element
+        const existingPaymentElement = document.getElementById('payment-element');
+        if (existingPaymentElement) {
+            existingPaymentElement.remove();
+        }
+        
         // Create a temporary payment container in the cart modal
         const cartModalBody = document.getElementById('cartModalBody');
         const paymentContainer = document.createElement('div');
@@ -567,6 +588,8 @@ async function processStripePayment() {
         
         // Add payment element to cart modal
         cartModalBody.appendChild(paymentContainer);
+        
+        // Mount the payment element
         paymentElement.mount('#payment-element');
         
         // Add checkout button to cart modal footer
