@@ -177,60 +177,6 @@
                         View Cart
                     </button>
                     
-                    <!-- Checkout Form (Hidden by default) -->
-                    <div class="checkout-form" id="checkoutForm" style="display: none;">
-                        <h3>Complete Your Order</h3>
-                        <form id="orderForm">
-                            <div class="form-group">
-                                <label for="color">Color</label>
-                                <select id="color" name="color" required>
-                                    <option value="black">Jet Black</option>
-                                    <option value="orange">Sunset Orange</option>
-                                </select>
-                            </div>
-                            
-                            <div class="price-summary">
-                                <div class="price-item">
-                                    <span>Subtotal:</span>
-                                    <span id="subtotal">$30.00</span>
-                                </div>
-                                <div class="price-item">
-                                    <span>Shipping:</span>
-                                    <span>FREE</span>
-                                </div>
-                                <div class="price-item total">
-                                    <span>Total:</span>
-                                    <span id="total">$30.00</span>
-                                </div>
-                            </div>
-                            
-                            <!-- Stripe Payment Element -->
-                            <div id="payment-section" style="display: none;">
-                                <div class="payment-element-container">
-                                    <label>Payment Information</label>
-                                    <div id="payment-element">
-                                        <!-- Stripe Elements will create form elements here -->
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <button type="submit" class="checkout-button" id="checkout-button">
-                                <i class="fas fa-lock"></i>
-                                Secure Checkout - $30.00
-                            </button>
-                            
-                            <div class="payment-methods">
-                                <p>We accept:</p>
-                                <div class="payment-icons">
-                                    <i class="fab fa-cc-visa"></i>
-                                    <i class="fab fa-cc-mastercard"></i>
-                                    <i class="fab fa-cc-amex"></i>
-                                    <i class="fab fa-cc-paypal"></i>
-                                    <i class="fab fa-apple-pay"></i>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
                 </div>
             </div>
         </div>

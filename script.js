@@ -407,15 +407,7 @@ document.getElementById('checkoutBtn').addEventListener('click', async function(
         }
     }
     
-    // Show checkout form
-    const checkoutForm = document.getElementById('checkoutForm');
-    checkoutForm.style.display = 'block';
-    
-    // Scroll to checkout form
-    checkoutForm.scrollIntoView({ behavior: 'smooth' });
-    
-    // Update checkout form with cart items
-    updateCheckoutForm();
+    // Process Stripe payment directly from cart popup
     
     // Process Stripe payment
     await processStripePayment();
@@ -441,37 +433,64 @@ function updateCheckoutForm() {
     }
 }
 
-// Form validation and submission
-document.getElementById('orderForm').addEventListener('submit', async function(e) {
-    e.preventDefault();
-    
-    const formData = new FormData(this);
-    const email = formData.get('email');
-    const name = formData.get('name');
-    const address = formData.get('address');
-    const city = formData.get('city');
-    const zip = formData.get('zip');
-    
-    // Validate form
-    if (!email || !name || !address || !city || !zip) {
-        alert('Please fill in all required fields.');
-        return;
-    }
-    
+// Handle payment submission
+async function handleSubmit() {
     if (cart.items.length === 0) {
         alert('Your cart is empty. Please add items before checkout.');
         return;
     }
     
     // Show loading state
-    const checkoutButton = document.getElementById('checkout-button');
+    const checkoutButton = document.getElementById('checkoutBtn');
     const originalText = checkoutButton.innerHTML;
     checkoutButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
     checkoutButton.disabled = true;
     
     try {
         // Handle Stripe payment
-        await handleSubmit(e);
+        if (!stripe || !elements) {
+            console.error('Stripe not initialized');
+            return;
+        }
+        
+        const { error } = await stripe.confirmPayment({
+            elements,
+            confirmParams: {
+                return_url: window.location.origin + '/success',
+            },
+        });
+        
+        if (error) {
+            console.error('Payment failed:', error);
+            alert('Payment failed: ' + error.message);
+        } else {
+            // Track purchase event
+            trackEvent('purchase', {
+                transaction_id: Date.now().toString(),
+                currency: 'USD',
+                value: cart.total,
+                items: cart.items.map(item => ({
+                    item_id: item.id,
+                    item_name: item.name,
+                    item_category: 'AirPod Case',
+                    item_variant: `${item.color} - ${item.model}`,
+                    quantity: item.quantity,
+                    price: item.basePrice
+                }))
+            });
+            
+            // Payment succeeded
+            showSuccessModal({
+                items: cart.items,
+                total: cart.total
+            });
+            
+            // Clear cart
+            cart.items = [];
+            cart.total = 0;
+            updateCartDisplay();
+            hideCartModal();
+        }
     } catch (error) {
         console.error('Payment error:', error);
         alert('Payment failed. Please try again.');
@@ -480,7 +499,7 @@ document.getElementById('orderForm').addEventListener('submit', async function(e
         checkoutButton.innerHTML = originalText;
         checkoutButton.disabled = false;
     }
-});
+}
 
 // Stripe payment processing function
 async function processStripePayment() {
@@ -530,15 +549,25 @@ async function processStripePayment() {
         });
         
         paymentElement = elements.create('payment');
+        
+        // Create a temporary payment container in the cart modal
+        const cartModalBody = document.getElementById('cartModalBody');
+        const paymentContainer = document.createElement('div');
+        paymentContainer.id = 'payment-element';
+        paymentContainer.style.marginTop = '1rem';
+        paymentContainer.style.padding = '1rem';
+        paymentContainer.style.border = '1px solid #333';
+        paymentContainer.style.borderRadius = '10px';
+        paymentContainer.style.backgroundColor = '#0a0a0a';
+        
+        // Add payment element to cart modal
+        cartModalBody.appendChild(paymentContainer);
         paymentElement.mount('#payment-element');
         
-        // Show payment form
-        document.getElementById('checkoutForm').style.display = 'block';
-        document.getElementById('payment-section').style.display = 'block';
-        
-        // Handle form submission
-        const form = document.getElementById('orderForm');
-        form.addEventListener('submit', handleSubmit);
+        // Add checkout button to cart modal footer
+        const checkoutBtn = document.getElementById('checkoutBtn');
+        checkoutBtn.innerHTML = '<i class="fas fa-lock"></i> Complete Payment';
+        checkoutBtn.onclick = handleSubmit;
         
     } catch (error) {
         console.error('Error creating payment intent:', error);
@@ -546,53 +575,6 @@ async function processStripePayment() {
     }
 }
 
-// Handle form submission
-async function handleSubmit(event) {
-    event.preventDefault();
-    
-    if (!stripe || !elements) {
-        console.error('Stripe not initialized');
-        return;
-    }
-    
-    const { error } = await stripe.confirmPayment({
-        elements,
-        confirmParams: {
-            return_url: window.location.origin + '/success',
-        },
-    });
-    
-    if (error) {
-        console.error('Payment failed:', error);
-        alert('Payment failed: ' + error.message);
-    } else {
-        // Track purchase event
-        trackEvent('purchase', {
-            transaction_id: Date.now().toString(),
-            currency: 'USD',
-            value: cart.total,
-            items: cart.items.map(item => ({
-                item_id: item.id,
-                item_name: item.name,
-                item_category: 'AirPod Case',
-                item_variant: `${item.color} - ${item.model}`,
-                quantity: item.quantity,
-                price: item.basePrice
-            }))
-        });
-        
-        // Payment succeeded
-        showSuccessModal({
-            items: cart.items,
-            total: cart.total
-        });
-        
-        // Clear cart
-        cart.items = [];
-        cart.total = 0;
-        updateCartDisplay();
-    }
-}
 
 // Success modal
 function showSuccessModal(orderDetails) {
