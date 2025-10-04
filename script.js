@@ -20,6 +20,22 @@ async function initializeStripe() {
     }
 }
 
+// Analytics tracking functions
+function trackEvent(eventName, parameters = {}) {
+    if (typeof gtag !== 'undefined') {
+        gtag('event', eventName, parameters);
+    }
+}
+
+function trackPageView(pageName) {
+    if (typeof gtag !== 'undefined') {
+        gtag('event', 'page_view', {
+            page_title: pageName,
+            page_location: window.location.href
+        });
+    }
+}
+
 // Cart functionality
 let cart = {
     items: [],
@@ -100,6 +116,20 @@ function addToCart() {
     cart.total += totalPrice;
     
     updateCartDisplay();
+    
+    // Track add to cart event
+    trackEvent('add_to_cart', {
+        currency: 'USD',
+        value: totalPrice,
+        items: [{
+            item_id: cartItem.id,
+            item_name: cartItem.name,
+            item_category: 'AirPod Case',
+            item_variant: `${cartItem.color} - ${cartItem.model}`,
+            quantity: cartItem.quantity,
+            price: cartItem.basePrice
+        }]
+    });
     
     // Show success message
     const addToCartBtn = document.getElementById('addToCart');
@@ -228,6 +258,20 @@ function showCartModal() {
     const cartModal = document.getElementById('cartModal');
     cartModal.style.display = 'flex';
     updateCartModal();
+    
+    // Track cart view event
+    trackEvent('view_cart', {
+        currency: 'USD',
+        value: cart.total,
+        items: cart.items.map(item => ({
+            item_id: item.id,
+            item_name: item.name,
+            item_category: 'AirPod Case',
+            item_variant: `${item.color} - ${item.model}`,
+            quantity: item.quantity,
+            price: item.basePrice
+        }))
+    });
 }
 
 function hideCartModal() {
@@ -339,6 +383,20 @@ document.getElementById('cartModal').addEventListener('click', function(e) {
 // Checkout button in cart modal
 document.getElementById('checkoutBtn').addEventListener('click', async function() {
     hideCartModal();
+    
+    // Track begin checkout event
+    trackEvent('begin_checkout', {
+        currency: 'USD',
+        value: cart.total,
+        items: cart.items.map(item => ({
+            item_id: item.id,
+            item_name: item.name,
+            item_category: 'AirPod Case',
+            item_variant: `${item.color} - ${item.model}`,
+            quantity: item.quantity,
+            price: item.basePrice
+        }))
+    });
     
     // Initialize Stripe if not already done
     if (!stripe) {
@@ -508,6 +566,21 @@ async function handleSubmit(event) {
         console.error('Payment failed:', error);
         alert('Payment failed: ' + error.message);
     } else {
+        // Track purchase event
+        trackEvent('purchase', {
+            transaction_id: Date.now().toString(),
+            currency: 'USD',
+            value: cart.total,
+            items: cart.items.map(item => ({
+                item_id: item.id,
+                item_name: item.name,
+                item_category: 'AirPod Case',
+                item_variant: `${item.color} - ${item.model}`,
+                quantity: item.quantity,
+                price: item.basePrice
+            }))
+        });
+        
         // Payment succeeded
         showSuccessModal({
             items: cart.items,
@@ -703,6 +776,9 @@ function scrollToSection(sectionId) {
 
 // Initialize page
 document.addEventListener('DOMContentLoaded', async function() {
+    // Track page view
+    trackPageView('LumoCase Homepage');
+    
     // Initialize Stripe
     await initializeStripe();
     
