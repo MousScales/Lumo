@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Cancelled - LumoCase</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .cancel-container {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+        
+        .cancel-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 3rem;
+            text-align: center;
+            max-width: 500px;
+            width: 100%;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+        
+        .cancel-icon {
+            font-size: 4rem;
+            color: #f59e0b;
+            margin-bottom: 1.5rem;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+        
+        .cancel-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 1rem;
+        }
+        
+        .cancel-message {
+            font-size: 1.1rem;
+            color: #d1d5db;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+        
+        .help-section {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .help-section h3 {
+            color: #fbbf24;
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+        }
+        
+        .help-info {
+            color: #d1d5db;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+        
+        .btn-group {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            color: #0a0a0a;
+            box-shadow: 0 10px 25px rgba(251, 191, 36, 0.3);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 35px rgba(251, 191, 36, 0.4);
+        }
+        
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+        
+        @media (max-width: 480px) {
+            .cancel-card {
+                padding: 2rem;
+            }
+            
+            .cancel-title {
+                font-size: 2rem;
+            }
+            
+            .btn-group {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="cancel-container">
+        <div class="cancel-card">
+            <div class="cancel-icon">
+                <i class="fas fa-times-circle"></i>
+            </div>
+            
+            <h1 class="cancel-title">Order Cancelled</h1>
+            
+            <p class="cancel-message">
+                Your order was cancelled. No charges have been made to your account.
+            </p>
+            
+            <div class="help-section">
+                <h3>Need Help?</h3>
+                <div class="help-info">
+                    <p>• Having trouble with checkout? Contact our support team</p>
+                    <p>• Want to try a different payment method?</p>
+                    <p>• Questions about our products? We're here to help!</p>
+                </div>
+            </div>
+            
+            <div class="btn-group">
+                <a href="/" class="btn btn-primary">
+                    <i class="fas fa-shopping-cart"></i>
+                    Continue Shopping
+                </a>
+                <a href="mailto:support@lumocase.com" class="btn btn-secondary">
+                    <i class="fas fa-envelope"></i>
+                    Contact Support
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Track cancelled checkout
+        if (typeof gtag !== 'undefined') {
+            gtag('event', 'begin_checkout', {
+                currency: 'USD',
+                value: 0
+            });
+        }
+    </script>
+</body>
+</html>

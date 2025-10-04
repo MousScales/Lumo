@@ -141,6 +141,85 @@ app.get('/api/products', async (req, res) => {
   }
 });
 
+// Create Stripe Checkout Session
+app.post('/api/create-checkout-session', async (req, res) => {
+  try {
+    const { items } = req.body;
+    
+    if (!items || items.length === 0) {
+      return res.status(400).json({ error: 'No items provided' });
+    }
+    
+    // Calculate total amount and prepare line items
+    let totalAmount = 0;
+    const lineItems = [];
+    
+    for (const item of items) {
+      const productId = `${item.color}-${item.modelId}`;
+      const productData = PRODUCTS[productId];
+      
+      if (!productData) {
+        return res.status(400).json({ error: `Invalid product: ${productId}` });
+      }
+      
+      // Apply quantity discounts
+      let itemPrice = productData.price;
+      if (item.quantity === 2) {
+        itemPrice = 2750; // $27.50 each
+      } else if (item.quantity === 3) {
+        itemPrice = 2667; // $26.67 each
+      }
+      
+      const itemTotal = itemPrice * item.quantity;
+      totalAmount += itemTotal;
+      
+      lineItems.push({
+        price_data: {
+          currency: 'usd',
+          product_data: {
+            name: productData.name,
+            description: productData.description,
+            images: productData.images,
+          },
+          unit_amount: itemPrice,
+        },
+        quantity: item.quantity,
+      });
+    }
+    
+    // Create Stripe Checkout Session
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ['card'],
+      line_items: lineItems,
+      mode: 'payment',
+      success_url: `${req.headers.origin}/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${req.headers.origin}/cancel`,
+      customer_email: undefined, // Let Stripe collect this
+      shipping_address_collection: {
+        allowed_countries: ['US', 'CA', 'GB', 'AU', 'DE', 'FR', 'IT', 'ES', 'NL', 'BE', 'AT', 'CH', 'SE', 'NO', 'DK', 'FI'],
+      },
+      billing_address_collection: 'required',
+      phone_number_collection: {
+        enabled: true,
+      },
+      metadata: {
+        cart_items: JSON.stringify(items),
+        total_amount: totalAmount.toString(),
+      },
+    });
+    
+    res.json({
+      sessionId: session.id,
+      url: session.url,
+      totalAmount: totalAmount
+    });
+    
+  } catch (error) {
+    console.error('Error creating checkout session:', error);
+    res.status(500).json({ error: 'Failed to create checkout session' });
+  }
+});
+
 // Create payment intent
 app.post('/api/create-payment-intent', async (req, res) => {
   try {
@@ -197,6 +276,16 @@ app.post('/api/create-payment-intent', async (req, res) => {
     console.error('Error creating payment intent:', error);
     res.status(500).json({ error: 'Failed to create payment intent' });
   }
+});
+
+// Success page
+app.get('/success', (req, res) => {
+  res.sendFile(path.join(__dirname, 'success.html'));
+});
+
+// Cancel page
+app.get('/cancel', (req, res) => {
+  res.sendFile(path.join(__dirname, 'cancel.html'));
 });
 
 // Serve static files

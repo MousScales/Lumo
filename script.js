@@ -394,21 +394,7 @@ document.getElementById('cartModal').addEventListener('click', function(e) {
 
 // Checkout button in cart modal
 document.getElementById('checkoutBtn').addEventListener('click', async function() {
-    console.log('Initial checkout button clicked');
-    
-    // Track begin checkout event
-    trackEvent('begin_checkout', {
-        currency: 'USD',
-        value: cart.total,
-        items: cart.items.map(item => ({
-            item_id: item.id,
-            item_name: item.name,
-            item_category: 'AirPod Case',
-            item_variant: `${item.color} - ${item.model}`,
-            quantity: item.quantity,
-            price: item.basePrice
-        }))
-    });
+    console.log('Checkout button clicked');
     
     // Initialize Stripe if not already done
     if (!stripe) {
@@ -419,11 +405,8 @@ document.getElementById('checkoutBtn').addEventListener('click', async function(
         }
     }
     
-    // Process Stripe payment directly from cart popup
-    await processStripePayment();
-    
-    // After payment element is created, the button will call handleSubmit
-    // This is handled by the processStripePayment function
+    // Handle checkout
+    await handleCheckout();
 });
 
 // Update checkout form with cart items
@@ -446,9 +429,9 @@ function updateCheckoutForm() {
     }
 }
 
-// Handle payment submission
-async function handleSubmit() {
-    console.log('handleSubmit called');
+// Handle checkout button click - redirect to Stripe Checkout
+async function handleCheckout() {
+    console.log('handleCheckout called');
     console.log('Cart items:', cart.items);
     console.log('Cart total:', cart.total);
     
@@ -460,89 +443,26 @@ async function handleSubmit() {
     // Show loading state
     const checkoutButton = document.getElementById('checkoutBtn');
     const originalText = checkoutButton.innerHTML;
-    checkoutButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+    checkoutButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Redirecting...';
     checkoutButton.disabled = true;
     
     try {
-        // Handle Stripe payment
-        if (!stripe || !elements) {
-            console.error('Stripe not initialized');
-            alert('Payment system not available. Please try again later.');
-            // Re-enable button
-            checkoutButton.innerHTML = originalText;
-            checkoutButton.disabled = false;
-            return;
-        }
-        
-        // Check if payment element is mounted
-        const paymentElementContainer = document.getElementById('payment-element');
-        if (!paymentElementContainer || !paymentElement) {
-            console.error('Payment element not properly mounted');
-            alert('Payment form not ready. Please try again.');
-            // Re-enable button
-            checkoutButton.innerHTML = originalText;
-            checkoutButton.disabled = false;
-            return;
-        }
-        
-        const { error } = await stripe.confirmPayment({
-            elements,
-            confirmParams: {
-                return_url: window.location.origin + '/success',
-            },
-        });
-        
-        if (error) {
-            console.error('Payment failed:', error);
-            alert('Payment failed: ' + error.message);
-        } else {
-            // Track purchase event
-            trackEvent('purchase', {
-                transaction_id: Date.now().toString(),
-                currency: 'USD',
-                value: cart.total,
-                items: cart.items.map(item => ({
-                    item_id: item.id,
-                    item_name: item.name,
-                    item_category: 'AirPod Case',
-                    item_variant: `${item.color} - ${item.model}`,
-                    quantity: item.quantity,
-                    price: item.basePrice
-                }))
-            });
-            
-            // Payment succeeded
-            showSuccessModal({
-                items: cart.items,
-                total: cart.total
-            });
-            
-            // Clear cart
-            cart.items = [];
-            cart.total = 0;
-            updateCartDisplay();
-            hideCartModal();
-        }
+        // Process Stripe checkout
+        await processStripePayment();
     } catch (error) {
-        console.error('Payment error:', error);
-        alert('Payment failed. Please try again.');
-    } finally {
-        // Reset button
+        console.error('Checkout error:', error);
+        alert('Checkout failed. Please try again.');
+        // Re-enable button
         checkoutButton.innerHTML = originalText;
         checkoutButton.disabled = false;
     }
 }
 
-// Stripe payment processing function
+// Stripe checkout processing function
 async function processStripePayment() {
-    if (!stripe) {
-        console.error('Stripe not initialized');
-        return;
-    }
-    
     try {
-        // Create payment intent
-        const response = await fetch('/api/create-payment-intent', {
+        // Create checkout session
+        const response = await fetch('/api/create-checkout-session', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -554,67 +474,36 @@ async function processStripePayment() {
         
         if (!response.ok) {
             const errorData = await response.json();
-            throw new Error(errorData.error || 'Failed to create payment intent');
+            throw new Error(errorData.error || 'Failed to create checkout session');
         }
         
-        const { clientSecret, totalAmount } = await response.json();
+        const { sessionId, url, totalAmount } = await response.json();
         
-        if (!clientSecret) {
-            throw new Error('No client secret received from server');
+        if (!url) {
+            throw new Error('No checkout URL received from server');
         }
         
-        // Create payment element
-        elements = stripe.elements({
-            clientSecret: clientSecret,
-            appearance: {
-                theme: 'night',
-                variables: {
-                    colorPrimary: '#fbbf24',
-                    colorBackground: '#1a1a1a',
-                    colorText: '#ffffff',
-                    colorDanger: '#df1b41',
-                    fontFamily: 'Inter, system-ui, sans-serif',
-                    spacingUnit: '4px',
-                    borderRadius: '8px',
-                }
-            }
+        console.log('Redirecting to Stripe Checkout:', url);
+        
+        // Track begin checkout event
+        trackEvent('begin_checkout', {
+            currency: 'USD',
+            value: totalAmount / 100, // Convert from cents
+            items: cart.items.map(item => ({
+                item_id: item.id,
+                item_name: item.name,
+                item_category: 'AirPod Case',
+                item_variant: `${item.color} - ${item.model}`,
+                quantity: item.quantity,
+                price: item.basePrice
+            }))
         });
         
-        paymentElement = elements.create('payment');
-        
-        // Clean up any existing payment element
-        const existingPaymentElement = document.getElementById('payment-element');
-        if (existingPaymentElement) {
-            existingPaymentElement.remove();
-        }
-        
-        // Create a temporary payment container in the cart modal
-        const cartModalBody = document.getElementById('cartModalBody');
-        const paymentContainer = document.createElement('div');
-        paymentContainer.id = 'payment-element';
-        paymentContainer.style.marginTop = '1rem';
-        paymentContainer.style.padding = '1rem';
-        paymentContainer.style.border = '1px solid #333';
-        paymentContainer.style.borderRadius = '10px';
-        paymentContainer.style.backgroundColor = '#0a0a0a';
-        
-        // Add payment element to cart modal
-        cartModalBody.appendChild(paymentContainer);
-        
-        // Mount the payment element
-        paymentElement.mount('#payment-element');
-        
-        // Update checkout button text and set up click handler
-        const checkoutBtn = document.getElementById('checkoutBtn');
-        checkoutBtn.innerHTML = '<i class="fas fa-lock"></i> Complete Payment';
-        
-        // Remove any existing event listeners and add the payment handler
-        checkoutBtn.replaceWith(checkoutBtn.cloneNode(true));
-        const newCheckoutBtn = document.getElementById('checkoutBtn');
-        newCheckoutBtn.addEventListener('click', handleSubmit);
+        // Redirect to Stripe Checkout
+        window.location.href = url;
         
     } catch (error) {
-        console.error('Error creating payment intent:', error);
+        console.error('Error creating checkout session:', error);
         alert('Error processing payment: ' + error.message);
     }
 }
