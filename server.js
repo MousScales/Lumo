@@ -17,49 +17,49 @@ const PRODUCTS = {
   'black-airpods-2': {
     name: 'LumoCase AirPod Case (Black) - AirPods 2',
     description: 'Glow-in-the-dark AirPod case with mesmerizing moving sand effects for AirPods 2',
-    price: 3000, // $30.00 in cents
+    price: 2500, // $25.00 in cents
     images: ['black.png']
   },
   'black-airpods-3': {
     name: 'LumoCase AirPod Case (Black) - AirPods 3',
     description: 'Glow-in-the-dark AirPod case with mesmerizing moving sand effects for AirPods 3',
-    price: 3000,
+    price: 2500, // $25.00 in cents
     images: ['black.png']
   },
   'black-airpods-4': {
     name: 'LumoCase AirPod Case (Black) - AirPods 4',
     description: 'Glow-in-the-dark AirPod case with mesmerizing moving sand effects for AirPods 4',
-    price: 3000,
+    price: 2500, // $25.00 in cents
     images: ['black.png']
   },
   'black-airpods-pro': {
     name: 'LumoCase AirPod Case (Black) - AirPods Pro',
     description: 'Glow-in-the-dark AirPod case with mesmerizing moving sand effects for AirPods Pro',
-    price: 3000,
+    price: 2500, // $25.00 in cents
     images: ['black.png']
   },
   'orange-airpods-2': {
     name: 'LumoCase AirPod Case (Orange) - AirPods 2',
     description: 'Glow-in-the-dark AirPod case with mesmerizing moving sand effects for AirPods 2',
-    price: 3000,
+    price: 2500, // $25.00 in cents
     images: ['orange.png']
   },
   'orange-airpods-3': {
     name: 'LumoCase AirPod Case (Orange) - AirPods 3',
     description: 'Glow-in-the-dark AirPod case with mesmerizing moving sand effects for AirPods 3',
-    price: 3000,
+    price: 2500, // $25.00 in cents
     images: ['orange.png']
   },
   'orange-airpods-4': {
     name: 'LumoCase AirPod Case (Orange) - AirPods 4',
     description: 'Glow-in-the-dark AirPod case with mesmerizing moving sand effects for AirPods 4',
-    price: 3000,
+    price: 2500, // $25.00 in cents
     images: ['orange.png']
   },
   'orange-airpods-pro': {
     name: 'LumoCase AirPod Case (Orange) - AirPods Pro',
     description: 'Glow-in-the-dark AirPod case with mesmerizing moving sand effects for AirPods Pro',
-    price: 3000,
+    price: 2500, // $25.00 in cents
     images: ['orange.png']
   }
 };
@@ -165,9 +165,9 @@ app.post('/api/create-checkout-session', async (req, res) => {
       // Apply quantity discounts
       let itemPrice = productData.price;
       if (item.quantity === 2) {
-        itemPrice = 2750; // $27.50 each
+        itemPrice = 2250; // $22.50 each (total $45 for 2)
       } else if (item.quantity === 3) {
-        itemPrice = 2667; // $26.67 each
+        itemPrice = 2167; // $21.67 each (total $65 for 3)
       }
       
       const itemTotal = itemPrice * item.quantity;
@@ -187,6 +187,37 @@ app.post('/api/create-checkout-session', async (req, res) => {
       });
     }
     
+    // Add shipping and tax
+    const shipping = 500; // $5.00 in cents
+    const tax = Math.round((totalAmount + shipping) * 0.10); // 10% tax
+    const finalTotal = totalAmount + shipping + tax;
+    
+    // Add shipping as a line item
+    lineItems.push({
+      price_data: {
+        currency: 'usd',
+        product_data: {
+          name: 'Shipping',
+          description: 'Standard shipping',
+        },
+        unit_amount: shipping,
+      },
+      quantity: 1,
+    });
+    
+    // Add tax as a line item
+    lineItems.push({
+      price_data: {
+        currency: 'usd',
+        product_data: {
+          name: 'Tax (10%)',
+          description: 'Sales tax',
+        },
+        unit_amount: tax,
+      },
+      quantity: 1,
+    });
+    
     // Create Stripe Checkout Session
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
@@ -204,14 +235,14 @@ app.post('/api/create-checkout-session', async (req, res) => {
       },
       metadata: {
         cart_items: JSON.stringify(items),
-        total_amount: totalAmount.toString(),
+        total_amount: finalTotal.toString(),
       },
     });
     
     res.json({
       sessionId: session.id,
       url: session.url,
-      totalAmount: totalAmount
+      totalAmount: finalTotal
     });
     
   } catch (error) {
@@ -244,9 +275,9 @@ app.post('/api/create-payment-intent', async (req, res) => {
       // Apply quantity discounts
       let itemPrice = productData.price;
       if (item.quantity === 2) {
-        itemPrice = 2750; // $27.50 each
+        itemPrice = 2250; // $22.50 each (total $45 for 2)
       } else if (item.quantity === 3) {
-        itemPrice = 2667; // $26.67 each
+        itemPrice = 2167; // $21.67 each (total $65 for 3)
       }
       
       const itemTotal = itemPrice * item.quantity;

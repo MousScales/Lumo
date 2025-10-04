@@ -45,15 +45,20 @@ let cart = {
 // Price calculation
 function updatePrice() {
     const quantity = parseInt(document.getElementById('quantity').value);
-    const basePrice = 30.00;
-    let totalPrice = basePrice * quantity;
+    const basePrice = 25.00; // Base price per item
+    let subtotal = basePrice * quantity;
     
-    // Apply discounts
+    // Apply quantity discounts
     if (quantity === 2) {
-        totalPrice = 55.00; // $5 discount
+        subtotal = 45.00; // $5 discount total
     } else if (quantity === 3) {
-        totalPrice = 80.00; // $10 discount
+        subtotal = 65.00; // $10 discount total
     }
+    
+    // Add shipping and tax
+    const shipping = 5.00;
+    const tax = (subtotal + shipping) * 0.10; // 10% tax
+    const totalPrice = subtotal + shipping + tax;
     
     // Update add to cart button
     const addToCartBtn = document.querySelector('.add-to-cart-btn');
@@ -81,15 +86,20 @@ function addToCart() {
     const quantity = parseInt(document.getElementById('quantity').value);
     const color = document.querySelector('.style-btn.active').dataset.style;
     const model = document.querySelector('.model-btn.active').dataset.model;
-    const basePrice = 30.00;
-    let totalPrice = basePrice * quantity;
+    const basePrice = 25.00; // Base price per item
+    let subtotal = basePrice * quantity;
     
-    // Apply discounts
+    // Apply quantity discounts
     if (quantity === 2) {
-        totalPrice = 55.00;
+        subtotal = 45.00; // $5 discount total
     } else if (quantity === 3) {
-        totalPrice = 80.00;
+        subtotal = 65.00; // $10 discount total
     }
+    
+    // Add shipping and tax
+    const shipping = 5.00;
+    const tax = (subtotal + shipping) * 0.10; // 10% tax
+    const totalPrice = subtotal + shipping + tax;
     
     // Format model name for display
     const modelName = model.replace('airpods-', 'AirPods ').replace(/\b\w/g, l => l.toUpperCase());
