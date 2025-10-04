@@ -286,6 +286,7 @@ function hideCartModal() {
     const checkoutBtn = document.getElementById('checkoutBtn');
     if (checkoutBtn) {
         checkoutBtn.innerHTML = '<i class="fas fa-lock"></i> Proceed to Checkout';
+        checkoutBtn.disabled = false;
         checkoutBtn.onclick = null;
     }
 }
@@ -448,6 +449,8 @@ function updateCheckoutForm() {
 // Handle payment submission
 async function handleSubmit() {
     console.log('handleSubmit called');
+    console.log('Cart items:', cart.items);
+    console.log('Cart total:', cart.total);
     
     if (cart.items.length === 0) {
         alert('Your cart is empty. Please add items before checkout.');
@@ -465,6 +468,9 @@ async function handleSubmit() {
         if (!stripe || !elements) {
             console.error('Stripe not initialized');
             alert('Payment system not available. Please try again later.');
+            // Re-enable button
+            checkoutButton.innerHTML = originalText;
+            checkoutButton.disabled = false;
             return;
         }
         
@@ -473,6 +479,9 @@ async function handleSubmit() {
         if (!paymentElementContainer || !paymentElement) {
             console.error('Payment element not properly mounted');
             alert('Payment form not ready. Please try again.');
+            // Re-enable button
+            checkoutButton.innerHTML = originalText;
+            checkoutButton.disabled = false;
             return;
         }
         

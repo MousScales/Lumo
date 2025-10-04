@@ -842,6 +842,15 @@ body {
     box-shadow: 0 15px 35px rgba(251, 191, 36, 0.4);
 }
 
+.checkout-btn:disabled {
+    background: #666;
+    color: #999;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+    opacity: 0.6;
+}
+
 .empty-cart {
     text-align: center;
     color: #9ca3af;
