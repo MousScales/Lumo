@@ -393,7 +393,7 @@ document.getElementById('cartModal').addEventListener('click', function(e) {
 
 // Checkout button in cart modal
 document.getElementById('checkoutBtn').addEventListener('click', async function() {
-    hideCartModal();
+    console.log('Initial checkout button clicked');
     
     // Track begin checkout event
     trackEvent('begin_checkout', {
@@ -419,9 +419,10 @@ document.getElementById('checkoutBtn').addEventListener('click', async function(
     }
     
     // Process Stripe payment directly from cart popup
-    
-    // Process Stripe payment
     await processStripePayment();
+    
+    // After payment element is created, the button will call handleSubmit
+    // This is handled by the processStripePayment function
 });
 
 // Update checkout form with cart items
@@ -446,6 +447,8 @@ function updateCheckoutForm() {
 
 // Handle payment submission
 async function handleSubmit() {
+    console.log('handleSubmit called');
+    
     if (cart.items.length === 0) {
         alert('Your cart is empty. Please add items before checkout.');
         return;
@@ -592,10 +595,14 @@ async function processStripePayment() {
         // Mount the payment element
         paymentElement.mount('#payment-element');
         
-        // Add checkout button to cart modal footer
+        // Update checkout button text and set up click handler
         const checkoutBtn = document.getElementById('checkoutBtn');
         checkoutBtn.innerHTML = '<i class="fas fa-lock"></i> Complete Payment';
-        checkoutBtn.onclick = handleSubmit;
+        
+        // Remove any existing event listeners and add the payment handler
+        checkoutBtn.replaceWith(checkoutBtn.cloneNode(true));
+        const newCheckoutBtn = document.getElementById('checkoutBtn');
+        newCheckoutBtn.addEventListener('click', handleSubmit);
         
     } catch (error) {
         console.error('Error creating payment intent:', error);
