@@ -1,5 +1,5 @@
 // Stripe configuration
-const STRIPE_PUBLISHABLE_KEY = 'your_stripe_publishable_key_here';
+const STRIPE_PUBLISHABLE_KEY = 'pk_live_51SEIs1RyN1JZ733WSrAqTs40oWPn5n6mXVWANmWBRKawz8xNEv5mPjKYU13ouJK0J3Btux5pZk9eBEcctYqAPv0V0052EsT8ni';
 let stripe;
 let elements;
 let paymentElement;

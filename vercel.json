@@ -24,6 +24,46 @@
     {
       "src": "*.jpg",
       "use": "@vercel/static"
+    },
+    {
+      "src": "*.JPG",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "black.png",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "orange.png",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "1.PNG",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "2.PNG",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "3.PNG",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "4.PNG",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "5.PNG",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "6.PNG",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "7.JPG",
+      "use": "@vercel/static"
     }
   ],
   "routes": [
