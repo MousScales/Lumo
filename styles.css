@@ -32,10 +32,15 @@ body {
 }
 
 .header-content {
-    display: flex;
-    justify-content: space-between;
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr;
     align-items: center;
     height: 70px;
+    gap: 2rem;
+}
+
+.logo {
+    justify-self: start;
 }
 
 .logo h2 {
@@ -48,14 +53,15 @@ body {
 .nav {
     display: flex;
     align-items: center;
-    gap: 2rem;
+    justify-content: flex-end;
+    gap: 1rem;
 }
 
 /* Header Quote */
 .header-quote {
-    flex: 1;
+    justify-self: center;
     text-align: center;
-    padding: 0 2rem;
+    padding: 0 1rem;
 }
 
 .header-quote p {
@@ -983,21 +989,21 @@ body {
     }
     
     .header-content {
+        display: flex;
         flex-direction: column;
         height: auto;
         padding: 1rem 0;
         gap: 1rem;
     }
     
-    .nav {
-        flex-direction: column;
-        gap: 1rem;
-        width: 100%;
+    .logo {
+        order: 1;
+        text-align: center;
     }
     
     .header-quote {
+        order: 2;
         padding: 0 1rem;
-        order: 1;
     }
     
     .header-quote p {
@@ -1005,8 +1011,13 @@ body {
         text-align: center;
     }
     
+    .nav {
+        order: 3;
+        justify-content: center;
+        width: 100%;
+    }
+    
     .cart-container {
-        order: 2;
         justify-content: center;
     }
     
@@ -1197,13 +1208,13 @@ body {
         padding: 0.5rem 0;
     }
     
-    .nav {
-        gap: 0.5rem;
-    }
-    
     .header-quote p {
         font-size: 0.9rem;
         line-height: 1.4;
+    }
+    
+    .nav {
+        gap: 0.5rem;
     }
     
     .product-page {
