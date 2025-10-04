@@ -1,0 +1,42 @@
+{
+  "name": "lumocase-airpod-case",
+  "version": "1.0.0",
+  "description": "A sleek, modern website for LumoCase AirPod case with Stripe checkout integration",
+  "main": "index.html",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "build": "echo 'No build process needed for static site'",
+    "deploy": "echo 'Ready for deployment to any static hosting service'"
+  },
+  "keywords": [
+    "airpod",
+    "case",
+    "ecommerce",
+    "stripe",
+    "checkout",
+    "responsive",
+    "modern"
+  ],
+  "author": "LumoCase Team",
+  "license": "MIT",
+  "devDependencies": {
+    "http-server": "^14.1.1",
+    "live-server": "^1.2.2"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0",
+    "stripe": "^14.25.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yourusername/lumocase-website.git"
+  },
+  "homepage": "https://yourusername.github.io/lumocase-website",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/yourusername/lumocase-website/issues"
+  }
+}
