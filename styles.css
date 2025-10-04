@@ -638,6 +638,53 @@ body {
     color: #fbbf24;
 }
 
+.social-links {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.social-links a {
+    color: #9ca3af;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    padding: 0.5rem 0;
+}
+
+.social-links a:hover {
+    color: #fbbf24;
+    transform: translateX(5px);
+}
+
+.social-links a i {
+    font-size: 1.2rem;
+    width: 20px;
+    text-align: center;
+}
+
+.footer-section a {
+    color: #9ca3af;
+    text-decoration: none;
+    transition: color 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.footer-section a:hover {
+    color: #fbbf24;
+}
+
+.footer-section a i {
+    font-size: 1rem;
+    width: 16px;
+    text-align: center;
+}
+
 .footer-bottom {
     text-align: center;
     padding-top: 2rem;
